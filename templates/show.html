@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<ul class="entries">
+
+  {% for entry in entries %}
+    <li><h2>{{ entry }}</h2></li>
+  {% else %}
+    <li><em>Some error occurred...</em></li>
+  {% endfor %}
+
+</ul>
+
+{% endblock %}
