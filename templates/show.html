@@ -1,21 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title></title>
-</head>
-<body>
+
 {% extends "layout.html" %}
 
 {% block body %}
 
-<ul class="entries">
-  {% for key in content %}
-	  	<br><h2>{{ key }}</h2>
-	  	<br><li><h3>{{content[key]}}</h3></li>
-  {% else %}
-    <li><em>Some error occurred...</em></li>
-  {% endfor %}
-</ul>
+<div class="container">
+	<div class="entries">
+		<div class="list-group">
+			{% for key in content %}
+				{% if content[key][1] == True %}
+					<div class="list-group-item list-group-item-success"">
+					  	<a href="#{{key}}"  data-toggle="collapse">
+							<h4 class="list-group-item-heading">{{ content[key][0] }}</h4>
+					  	</a>
+							<p id="{{key}}" class="list-group-item-text collapse">{{content[key][2]}}</p>
+					</div>
+				{% else %}
+					<div class="list-group-item list-group-item-danger"">
+					  	<a href="#{{key}}"  data-toggle="collapse">
+							<h4 class="list-group-item-heading">{{ content[key][0] }}</h4>
+					  	</a>
+							<p id="{{key}}" class="list-group-item-text collapse">{{content[key][2]}}</p>
+					</div>
+				{% endif %}
+			{% endfor %}
+
+		</div>
+	</div>
+</div>
 
 {% endblock %}
-</body>

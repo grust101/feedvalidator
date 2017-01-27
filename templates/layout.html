@@ -2,36 +2,54 @@
 
 <html>
 <head>
-	<title></title>
+
+	<title>RichRelevance FeedValidator</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- jQuery files -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+		      // alert("document ready occurred!");
+
+
+		});
+	</script>
 </head>
 <body>
-<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-		<h1><a class="navbar-brand" href="#">RR Feed Validator
-		</a></h1>
+	<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+		<h1><a class="navbar-brand" href="#">RR Feed Validator</a></h1>
 	</nav>
 
+	<div class="container-fluid">    
+	  <div class="row content" style="margin-bottom: 25px">
+	    <div class="col-sm-1 sidenav">
+	    </div>
 
-	<form method="POST" action="uploadFile" enctype="multipart/form-data">
-		<h2><strong>Upload file:</strong></h2>
-		<input type="file" name="file" />
-	</form>
+	    <div class="col-sm-10"> 
+			<form method="POST" action="uploadFile" enctype="multipart/form-data">
+				<h2><strong>Direct to ZIP File:</strong></h2>
+				<input type="file" name="file" />
+			</form>
+	    </div>
 
-	<div class="page">
-		{% block body %}{% endblock %}
+	    <div class="col-sm-1 sidenav">
+	    </div>
+	  </div>
+			<div class="page">
+				{% block body %}{% endblock %}
+			</div>
 	</div>
 
+	<footer class="container-fluid text-center">
+	  <p>&copy; Copyright RichRelevance 2017</p>
+	</footer>
+
 </body>
-<link rel="stylesheet" type="text/css" href="static/css/style.css" />
 
-
--->Latest compiled and minified CSS
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-Optional theme
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-Latest compiled and minified JavaScript
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-  </html>
+</html>
 
