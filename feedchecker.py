@@ -1,17 +1,18 @@
 #!/usr/bin/python
-
 import sys
 import zipfile
 import re
 import collections
 import csv
 import json
+from collections import OrderedDict
 
 csv.field_size_limit(sys.maxsize)
 
 	
 def main(filepath, delimiter):
 	validated_feed = {}
+	invalidlist = []
 	feedFile = filepath
 	delim = "|"
 	catIds = list()
@@ -48,10 +49,10 @@ def main(filepath, delimiter):
 		print "Feed file Name ----> ", feedFile
 		pattern = re.search('\/catalog_full.*.zip',feedFile)
 		if(pattern is None):
-			validated_feed['filename_format'] = False
+			validated_feed['Filename format correct?'] = False, "The catalog filename format doesn\'t match the format catalog_full_sitename_.*.zip"
 			print '|The catalog filename format doesn\'t match the format catalog_full_sitename_.*.zip|'
 		else: 
-			validated_feed['filename_format'] = True
+			validated_feed['Filename Format correct?'] = True
 			print '|Catalog filename format check ---->|' 
 
 	##Zip file open and process
@@ -62,6 +63,7 @@ def main(filepath, delimiter):
 		fileArr = zipF.namelist()
 		print 'Following are the contents of the catalog feed file:'
 		print fileArr
+		validated_feed['Contents of Catalog Feed'] = fileArr
 		c = len(fileArr)
 		fileArr.sort()
 		fileArr1 = [None]*10
@@ -121,13 +123,15 @@ def main(filepath, delimiter):
 			validated_feed['column_count'] = catCount
 			print "Column Count Check Status ----> FAILED ",catCount
 		else:
-			validated_feed['column_count'] = catCount
+			validated_feed['column_count'] = "SUCCESS"
 			print "Column Count Check Status ----> SUCCESS"
 
 		if catHeaderRes is 1: 
 			print 'Category File Headers Check Status ----> SUCCESS'
+			validated_feed['Category File Headers Check Status'] = "SUCCESS"
 		else:
 			print 'Category File Headers Check Status ----> FAILED'
+			validated_feed['Category File Headers Check Status'] = "Failed"
 
 		parents = list()
 		for rows in theDict:	
@@ -150,6 +154,7 @@ def main(filepath, delimiter):
 			print "The following are repeating category ids:"
 			for y in catIdRepeat:
 				print y
+				validated_feed['Repeating Category IDs'] = catIdRepeat
 			print '----------->'
 
 		parents = set(parents)
@@ -167,7 +172,10 @@ def main(filepath, delimiter):
 						
 					if flag != 1 :
 						print "INVALID PARENT ---->", item
+						validated_feed['Invalid parent:']= item
 		print "Number of unique categories are:", len(set(catIds))
+		validated_feed['Number of unique categories are:'] = len(set(catIds))
+		return validated_feed
 
 	#Product Full file Checker
 	def productFullCheck(f,zipF,files):
@@ -183,13 +191,16 @@ def main(filepath, delimiter):
 		prodHeaderRes = headerCheck(prodHeader,f)
 		if prodHeaderRes is 1: 
 			print 'Product Full File Headers check status ----> SUCCESS'
+			validated_feed['Product Full File Headers check status'] = "SUCCESS"
 		else:
 			print 'Product Full Headers check status ----> FAILED'
-
+			validated_feed['Product Full File Headers check status'] = "FAILED"
 		if prodCount:
 			print "Column Count Check Status ----> FAILED ",prodCount
+			validated_feed['Column Count Check Status : FAILED'] = prodCount
 		else:
 			print "Column Count Check Status ----> SUCCESS"
+			validated_feed['Column Count Check Status'] = 'SUCCESS'
 
 		noPriceCount = 0
 		noRecCount = 0
@@ -205,7 +216,10 @@ def main(filepath, delimiter):
 				if rows['recommendable'] == 'false' or rows['recommendable'] == '' or rows['recommendable'] == '0':
 					noRecCount += 1
 		print "Number of Products with no Price ---->", noPriceCount
+		validated_feed['Number of products without price'] = noPriceCount
 		print "Number of Products with recommendable as False ---->", noRecCount
+		validated_feed['Number of Products with recommendable as False'] = noRecCount
+
 		theDict1 = fileOpen(f,zipF)
 		numOfProd = len(prodIds)
 		chkSetofProd = len(set(prodIds))
@@ -223,8 +237,11 @@ def main(filepath, delimiter):
 			print "The following are repeating product ids:"
 			print set(prodIdRepeat)
 			print '----------->'
+			validated_feed['Repeating Product IDs'] = set(prodIdRepeat)
+
 		else: 
 			print "Product Ids uniqueness Check ----> SUCCESS"
+			validated_feed['Repeating Product IDs'] = "None"
 		listDict = list(theDict1)
 		for item in parentProdSet:
 			flag = 0
@@ -235,7 +252,9 @@ def main(filepath, delimiter):
 						break
 					
 				if flag != 1 :
+					invalidlist.append(item)
 					print "INVALID PARENT PRODUCT ---->", item
+					validated_feed['Invalid Parent Product:'] = invalidlist
 			
 
 
@@ -253,13 +272,16 @@ def main(filepath, delimiter):
 		pcHeaderRes = headerCheck(pcHeader,f)
 		if pcHeaderRes is 1: 
 			print 'Product in Category File Headers check status ----> SUCCESS'
+			validated_feed['Product in Category File Headers check status'] = 'SUCCESS'
 		else:
 			print 'Product in Category File Headers check status ----> FAILED'
-
+			validated_feed['Product in Category File Headers check status'] = 'FAILED'
 		if pcCount:
 			print "Column Count Check Status ----> FAILED ",pcCount
+			validated_feed['Column Count Check Status'] = 'FAILED', pcCount
 		else:
 			print "Column Count Check Status ----> SUCCESS"
+			validated_feed['Column Count Check Status'] = 'SUCCESS'
 		pcProd = list()
 		pcCat = list()
 		for rows in pcDict:	
@@ -271,28 +293,28 @@ def main(filepath, delimiter):
 		setCat = set(catIds)
 		pcProdSet = set(pcProd)
 		pcCatSet = set(pcCat)
-		'''
+
 		for prod in set(pcProd):
 			if prod not in set(prodIds):
 				invalidProd.append(prod)
-		#print "CAT IDS in set --->", set(pcCat)
+		print "CAT IDS in set --->", set(pcCat)
 		#print "MASTER CAT --->", catIds
 		for cat in set(pcCat):
 			if cat not in set(catIds):
 				invalidCat.append(cat)
-		'''
+
 		# print 'MASTER CAT SET---->',setCat 
 		# print 'pc CAT SET',pcCatSet
 		invalidProd = list(pcProdSet - setProd)
 		invalidCat = list(pcCatSet - setCat)
-		# if invalidCat:
-		# 	print "Categories not in the category_full file are: ----> FAILED", invalidCat
-		# else:
-		# 	print "Categories are all valid ----> SUCCESS"
-		# if invalidProd:
-		# 	print "Products not in the product_full file are: ----> FAILED", invalidProd
-		# else:
-		# 	print "Products are all valid ----> SUCCESS"
+		if invalidCat:
+		 	print "Categories not in the category_full file are: ----> FAILED", invalidCat
+		else:
+		 	print "Categories are all valid ----> SUCCESS"
+		if invalidProd:
+		 	print "Products not in the product_full file are: ----> FAILED", invalidProd
+		else:
+		 	print "Products are all valid ----> SUCCESS"
 
 
 
@@ -309,13 +331,20 @@ def main(filepath, delimiter):
 		pAttHeaderRes = headerCheck(pAttHeader,f)
 		if pAttHeaderRes is 1: 
 			print 'Product in Category File Headers check status ----> SUCCESS'
+			validated_feed['Product in Category File Headers check status'] = 'SUCCESS'
 		else:
 			print 'Product in Category File Headers check status ----> FAILED'
+			validated_feed['Product in Category File Headers check status'] = 'FAILED'
+
 
 		if pAttCount:
 			print "Column Count Check Status ----> FAILED ",pAttCount
+			validated_feed['Column Count Check Status'] = 'FAILED', pAttCount
+
 		else:
 			print "Column Count Check Status ----> SUCCESS"
+			validated_feed['Column Count Check Status'] = 'SUCCESS'
+
 		pAttProd = list()
 		for rows in pAttDict:
 			pAttProd.append(rows['product_id'])
@@ -324,12 +353,19 @@ def main(filepath, delimiter):
 		pAttProdSet = set(pAttProd)
 		invalidProdAtt = list(pAttProdSet - setProd)
 		if invalidProdAtt:
-			print "Products not in the product_full file are: ----> FAILED" #, invalidProdAtt
+			print "Products not in the product_full file are: ----> FAILED" , invalidProdAtt
+			validated_feed['Products not in the product_full file are:'] = 'FAILED', invalidProdAtt
 		else:
 			print "Products are all valid ----> SUCCESS"
+			validated_feed['Products not in the product_full file are:'] = 'SUCCESS'
+
 		print "Product Att",len(pAttProd)
+		validated_feed['Product Attribute'] = len(pAttProd)
 		print "Product Att Set",len(pAttProdSet)
+		validated_feed['Product Attribute Set'] = len(pAttProdSet)
 		print "Product Full",len(setProd)
+		validated_feed['Product Full'] = len(setProd)
+		print validated_feed
 
 	#localized_product check
 	def localProdCheck(f,zipF,files):
@@ -344,13 +380,17 @@ def main(filepath, delimiter):
 		loProdHeaderRes = headerCheck(loProdHeader,f)
 		if loProdHeaderRes is 1: 
 			print 'Localized Product File Headers check status ----> SUCCESS'
+			validated_feed['Localized Product File Headers check status'] = "SUCCESS"
 		else:
 			print 'Localized Product  File Headers check status ----> FAILED'
+			validated_feed['Localized Product File Headers check status'] = "FAILED"
 
 		if loProdCount:
 			print "Column Count Check Status ----> FAILED ",loProdCount
+			validated_feed['Column Count Check Status'] = "FAILED" , loProdCount
 		else:
 			print "Column Count Check Status ----> SUCCESS"
+			validated_feed['Column Count Check Status'] = "SUCCESS"
 		loProdProd = list()
 		for rows in loProdDict:
 			loProdProd.append(rows['product_id'])
@@ -360,11 +400,17 @@ def main(filepath, delimiter):
 		invalidloProd = list(loProdProdSet - setProd)
 		if invalidloProd:
 			print "Products not in the product_full file are: ----> FAILED" #, invalidloProd
+			validated_feed['Column Count Check Status'] = "FAILED"
 		else:
 			print "Products are all valid ----> SUCCESS"
+		validated_feed['All products are valid'] = true
 		print "Product Att",len(loProdProd)
+		validated_feed['Product Attribute'] = len(loProdProd)
 		print "Product Att Set",len(loProdProdSet)
+		validated_feed['Product Attribute Set'] = len(loProdProdSet)
 		print "Product Full",len(setProd)
+		validated_feed['Product Full'] = len(setProd)
+
 
 
 	#Zip Content File Open and Reset
@@ -374,6 +420,7 @@ def main(filepath, delimiter):
 		fd = zipF.open(f) 
 		theDict = csv.DictReader(fd,delimiter=delim)
 		return theDict
+		validated_feed['The dictionary'] = theDict
 
 
 	#Header Check Function 
@@ -392,6 +439,8 @@ def main(filepath, delimiter):
 	                checkArray = ['product_id','name','description','language_tag','image_url','link_url']   
 	        else:
 			print 'Unidentified file type ---------> ', f
+			validated_feed['Unidentified File Type'] = f
+
 		flag1 = 1
 		for i in checkArray:
 			if re.search(i,header):
@@ -400,6 +449,7 @@ def main(filepath, delimiter):
 				flag1 = 0
 			if flag1 is 0:
 				print 'Following field in header needs review ---->',i 
+				validated_feed['Header field needs review:'] = i
 		return flag1
 
 	##Flat File Name Checker
@@ -424,8 +474,11 @@ def main(filepath, delimiter):
 				countPass = countPass + 1
 			if flag is 1:
 				print 'File Name Check ----> SUCCESS'
+				validated_feed['File Name Check'] = "SUCCESS"
 			else:
 				print 'File Name Check ----> FAILED'
+				validated_feed['File Name Check'] = "FAILED"
+
 		if countPass != c:
 			print 'File names within catalog feed aren\'t per required format' 
 			return 'pass'
@@ -438,5 +491,7 @@ def main(filepath, delimiter):
 	zf(feedFile)
 	#uniqueProdIdCheck()
 	ff.close()
-	return validated_feed
+	sorted_feed = OrderedDict(sorted(validated_feed.items(), key=lambda t: t[0]))
+	return sorted_feed
+
 

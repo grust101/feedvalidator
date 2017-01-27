@@ -1,14 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
 {% extends "layout.html" %}
+
 {% block body %}
 
 <ul class="entries">
-
-  {% for entry in entries %}
-    <li><h2>{{ entry }}</h2></li>
+  {% for key in content %}
+	  	<br><h2>{{ key }}</h2>
+	  	<br><li><h3>{{content[key]}}</h3></li>
   {% else %}
     <li><em>Some error occurred...</em></li>
   {% endfor %}
-
 </ul>
 
 {% endblock %}
+</body>
