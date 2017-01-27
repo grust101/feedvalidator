@@ -5,8 +5,10 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-	content = feedchecker.main("catalog_full_republicoftea_01_24_2017.zip", "|")
-	return render_template('show.html', content=content)
+	data = {
+		'content': feedchecker.main("catalog_full_republicoftea_01_24_2017.zip", "|")
+	}
+	return render_template('show.html', **data)
 
 if __name__ == "__main__":
 	app.run()
