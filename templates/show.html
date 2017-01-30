@@ -6,22 +6,88 @@
 <div class="container">
 	<div class="entries">
 		<div class="list-group">
-			{% for key in content %}
-				{% if content[key][1] == True %}
-					<div class="list-group-item list-group-item-success"">
-					  	<a href="#{{key}}"  data-toggle="collapse">
-							<h4 class="list-group-item-heading">{{ content[key][0] }}</h4>
-					  	</a>
-							<p id="{{key}}" class="list-group-item-text collapse">{{content[key][2]}}</p>
-					</div>
-				{% else %}
-					<div class="list-group-item list-group-item-danger"">
-					  	<a href="#{{key}}"  data-toggle="collapse">
-							<h4 class="list-group-item-heading">{{ content[key][0] }}</h4>
-					  	</a>
-							<p id="{{key}}" class="list-group-item-text collapse">{{content[key][2]}}</p>
-					</div>
-				{% endif %}
+			<h2>Overall:</h2>
+			{% for key in content['overall'] %}
+			{% if content['overall'][key][1] == True %}
+			<div class="list-group-item list-group-item-success"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['overall'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['overall'][key][2]}}</p>
+			</div>
+			{% else %}
+			<div class="list-group-item list-group-item-danger"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['overall'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['overall'][key][2]}}</p>
+			</div>
+			{% endif %}
+			{% endfor %}
+
+		</div>
+
+		<div class="list-group">
+			<h2>Category:</h2>
+			{% for key in content['category'] %}
+			{% if content['category'][key][1] == True %}
+			<div class="list-group-item list-group-item-success"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['category'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['category'][key][2]}}</p>
+			</div>
+			{% else %}
+			<div class="list-group-item list-group-item-danger"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['category'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['category'][key][2]}}</p>
+			</div>
+			{% endif %}
+			{% endfor %}
+
+		</div>
+
+		<div class="list-group">
+			<h2>Product:</h2>
+			{% for key in content['product'] %}
+			{% if content['product'][key][1] == True %}
+			<div class="list-group-item list-group-item-success"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['product'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['product'][key][2]}}</p>
+			</div>
+			{% else %}
+			<div class="list-group-item list-group-item-danger"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['product'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['product'][key][2]}}</p>
+			</div>
+			{% endif %}
+			{% endfor %}
+
+		</div>
+		<div class="list-group">
+			<h2>Product in Category:</h2>
+			{% for key in content['product in category'] %}
+			{% if content['product in category'][key][1] == True %}
+			<div class="list-group-item list-group-item-success"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['product in category'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['product in category'][key][2]}}</p>
+			</div>
+			{% else %}
+			<div class="list-group-item list-group-item-danger"">
+				<a href="#{{key}}"  data-toggle="collapse">
+					<h4 class="list-group-item-heading">{{ content['product in category'][key][0] }}</h4>
+				</a>
+				<p id="{{key}}" class="list-group-item-text collapse">{{content['product in category'][key][2]}}</p>
+			</div>
+			{% endif %}
 			{% endfor %}
 
 		</div>

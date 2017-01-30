@@ -13,41 +13,73 @@
 
 	<!-- jQuery files -->
 	<script type="text/javascript">
-		$(document).ready(function() {
-		      // alert("document ready occurred!");
+		$(function() {
 
+  // We can attach the `fileselect` event to all file inputs on the page
+  $(document).on('change', ':file', function() {
+  	var input = $(this),
+  	numFiles = input.get(0).files ? input.get(0).files.length : 1,
+  	label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+  	input.trigger('fileselect', [numFiles, label]);
+  });
 
-		});
-	</script>
+  // We can watch for our custom `fileselect` event like this
+  $(document).ready( function() {
+  	$(':file').on('fileselect', function(event, numFiles, label) {
+
+  		var input = $(this).parents('.input-group').find(':text'),
+  		log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+  		if( input.length ) {
+  			input.val(log);
+  		} else {
+  			if( log ) alert(log);
+  		}
+
+  	});
+  });
+  
+});
+
+</script>
 </head>
 <body>
-	<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-		<h1><a class="navbar-brand" href="#">RR Feed Validator</a></h1>
+	<nav class="navbar navbar-toggleable-md fixed-top" style="background-color: #990000">
+		<h1 class="navbar-brand vertical-center text-center" style="color:white; font-size:30px;">RR Feed Validator</h1>
 	</nav>
 
 	<div class="container-fluid">    
-	  <div class="row content" style="margin-bottom: 25px">
-	    <div class="col-sm-1 sidenav">
-	    </div>
-
-	    <div class="col-sm-10"> 
-			<form method="POST" action="uploadFile" enctype="multipart/form-data">
-				<h2><strong>Direct to ZIP File:</strong></h2>
-				<input type="file" name="file" />
-			</form>
-	    </div>
-
-	    <div class="col-sm-1 sidenav">
-	    </div>
-	  </div>
-			<div class="page">
-				{% block body %}{% endblock %}
+		<div class="row content" style="margin-bottom: 25px">
+		<div class="col-sm-4 sidenav">
 			</div>
-	</div>
 
-	<footer class="container-fluid text-center">
-	  <p>&copy; Copyright RichRelevance 2017</p>
-	</footer>
+			<div class="col-sm-4 text-center"> 
+				<form class="form-horizontal" method="GET" action="/check" enctype="multipart/form-data">
+					<div class="form-group">
+						<h2><strong>Choose a Feed File to Validate:</strong></h2>
+						<div class="input-group">
+							<label class="input-group-btn">
+								<span class="btn btn-default btn-md">
+									Browse&hellip; <input type="file" name="file" style="display: none;" multiple>
+								</span>
+							</label>
+							<input type="text" class="form-control" readonly>
+						</div>
+						<br>
+						<button class="btn btn-primary btn-lg" type="submit">Validate Feed</button>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-4 sidenav">
+			</div>
+		</div>
+		<div class="page">
+			{% block body %}{% endblock %}
+		</div>
+	</div>
+		<footer class="container-fluid text-center">
+			<p>&copy; Copyright RichRelevance 2017</p>
+		</footer>
 
 </body>
 
