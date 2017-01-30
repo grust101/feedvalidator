@@ -3,10 +3,16 @@ import feedchecker
 
 app = Flask(__name__)
 
+
 @app.route("/")
-def hello():
+def home():
+	return render_template('home.html')
+
+@app.route("/check")
+def show():
+	filepath = request.args.get("file")
 	data = {
-		'content': feedchecker.main("catalog_full_republicoftea_01_24_2017.zip", "|")
+		'content': feedchecker.main(filepath, "|")
 	}
 	return render_template('show.html', **data)
 
