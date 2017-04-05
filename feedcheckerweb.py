@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from werkzeug import secure_filename

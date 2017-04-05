@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys
 import argparse
 import zipfile
@@ -545,4 +545,3 @@ if __name__ == "__main__":
 	parser.add_argument('-d', '--delimiter', default='|', help='Field delimiter')
 	args = parser.parse_args()
 	main(args.feed, args.delimiter)
-	
