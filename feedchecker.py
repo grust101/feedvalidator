@@ -1,5 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys
+import argparse
 import zipfile
 import re
 import collections
@@ -9,7 +10,7 @@ from collections import OrderedDict
 
 csv.field_size_limit(sys.maxsize)
 
-	
+
 def main(filepath, delimiter):
 
 	# Set up variables
@@ -43,7 +44,7 @@ def main(filepath, delimiter):
 		ct = 0
 		colCountErr = list()
 		# print "Number of fields sent are: ",mainCount
-		for line in perLine :		
+		for line in perLine :
 			pipeCount = line.count(delim)
 			if ((pipeCount+1) != mainCount):
 				#print perLine
@@ -52,7 +53,7 @@ def main(filepath, delimiter):
 		return colCountErr
 
 
-	##File Name Format Check 
+	##File Name Format Check
 	def fileNameCheck(feedFile):
 		print '-------------------------------------'
 		print "Feed file Name ----> ", feedFile
@@ -60,9 +61,9 @@ def main(filepath, delimiter):
 		if(pattern is None):
 			validated_feed['overall']['filename_format'] = ['Filename Format Check', False, "The catalog filename format doesn\'t match the format catalog_full_sitename_.*.zip"]
 			print '|The catalog filename format doesn\'t match the format catalog_full_sitename_.*.zip|'
-		else: 
+		else:
 			validated_feed['overall']['filename_format'] = ['Filename Format Check', True, 'SUCCESS']
-			print '|Catalog filename format check ---->|' 
+			print '|Catalog filename format check ---->|'
 
 	##Zip file open and process
 	def zf(feedFile):
@@ -84,7 +85,7 @@ def main(filepath, delimiter):
 		# if feedStatus is 'pass':
 		# 	print 'Next steps are DATA Validation'
 		#for f in fileArr:
-		#	if re.search('^category_full.*.txt',f): 
+		#	if re.search('^category_full.*.txt',f):
 		#categoryFullCheck(fileArr[0],zipF,fileArr)
 		#	elif re.search('^product_full.*.txt',f):
 		#productFullCheck(fileArr[2],zipF,fileArr)
@@ -92,7 +93,7 @@ def main(filepath, delimiter):
 		#prodCatCheck(fileArr[3],zipF,fileArr)
 		#	elif re.search('^product_attribute.*.txt',f):
 		#prodAttCheck(fileArr[1],zipF,fileArr)
-		#	else: 
+		#	else:
 		#		print 'Unidentified file type ---------> ', f
 			#	exit(0)
 		for f in fileArr:
@@ -116,14 +117,14 @@ def main(filepath, delimiter):
 			prodAttCheck(fileArr1[3],zipF,fileArr)
 		if(fileArr1[4]):
 			localProdCheck(fileArr1[4],zipF,fileArr)
-		#	else: 
+		#	else:
 		#		print 'Unidentified file type ---------> ', f
 
 	#Category Full file Checker
 	def categoryFullCheck(f,zipF,files):
 		print '-----------------------------------------------'
 		print 'Category Full file Checker'
-		cfD = zipF.open(f) 
+		cfD = zipF.open(f)
 		print f + ' File validation in progress'
 		catLine = cfD.readlines()
 		theDict = fileOpen(f,zipF)
@@ -138,7 +139,7 @@ def main(filepath, delimiter):
 			validated_feed['category']['cat_column_count'] = ['Category Column Count', True, 'SUCCESS']
 			print "Column Count Check Status ----> SUCCESS"
 
-		if catHeaderRes is 1: 
+		if catHeaderRes is 1:
 			print 'Category File Headers Check Status ----> SUCCESS'
 			validated_feed['category']['cat_file_headers_check'] = ['Category File Headers Check', True, 'SUCCESS']
 		else:
@@ -146,7 +147,7 @@ def main(filepath, delimiter):
 			validated_feed['category']['cat_file_headers_check'] = ['Category File Headers Check', False, 'FAILED']
 
 		parents = list()
-		for rows in theDict:	
+		for rows in theDict:
 			if('parent_id' in rows.keys()):
 				parents.append(rows['parent_id'])
 			catIds.append(rows['category_id'])
@@ -186,11 +187,11 @@ def main(filepath, delimiter):
 						if item == rows['category_id']:
 							flag = 1
 							break
-						
+
 					if flag != 1 :
 						print "INVALID PARENT ---->", item
 						invalidParents.append(item)
-		
+
 		if len(invalidParents) == 0:
 			validated_feed['category']['invalid_parent']= ['Invalid Parent IDs', True, "None"]
 		else:
@@ -204,7 +205,7 @@ def main(filepath, delimiter):
 	def productFullCheck(f,zipF,files):
 		print '-----------------------------------------------'
 		print 'Product Full file Checker'
-		pfD = zipF.open(f) 
+		pfD = zipF.open(f)
 		print f + ' File validation in progress'
 		prodLine = pfD.readlines()
 		prodDict = fileOpen(f,zipF)
@@ -212,7 +213,7 @@ def main(filepath, delimiter):
 		#catDict = csv.DictReader(pfD2,delimiter='|')
 		prodHeader = prodLine[0].rstrip()
 		prodHeaderRes = headerCheck(prodHeader,f)
-		if prodHeaderRes is 1: 
+		if prodHeaderRes is 1:
 			print 'Product Full File Headers Check Status ----> SUCCESS'
 			validated_feed['product']['product_full_file_headers'] = ['Product Full File Headers Check', True, 'SUCCESS']
 		else:
@@ -227,7 +228,7 @@ def main(filepath, delimiter):
 
 		noPriceCount = 0
 		noRecCount = 0
-		for rows in prodDict:	
+		for rows in prodDict:
 			prodIds.append(rows['product_id'])
 			if('product_parent_id' in rows):
 				if(rows['product_parent_id']):
@@ -239,10 +240,10 @@ def main(filepath, delimiter):
 				if rows['recommendable'] == 'false' or rows['recommendable'] == '' or rows['recommendable'] == '0':
 					noRecCount += 1
 		print "Number of Products with no Price ---->", noPriceCount
-		if(noPriceCount == 0): 
+		if(noPriceCount == 0):
 			validated_feed['product']['products_without_price'] = ['Number of Products Without Price', True, noPriceCount]
 		else:
-			validated_feed['product']['products_without_price'] = ['Number of Products Without Price', False, noPriceCount]	
+			validated_feed['product']['products_without_price'] = ['Number of Products Without Price', False, noPriceCount]
 		print "Number of Products with recommendable as False ---->", noRecCount
 		if(noRecCount == 0):
 			validated_feed['product']['products_with_false_recommendable'] = ['Number of Products with Recommendable as False', True, noRecCount]
@@ -268,7 +269,7 @@ def main(filepath, delimiter):
 			print '----------->'
 			validated_feed['product']['repeat_product_ids'] = ['Repeating Product IDs', False, set(prodIdRepeat)]
 
-		else: 
+		else:
 			print "Product Ids uniqueness Check ----> SUCCESS"
 			validated_feed['product']['repeat_product_ids'] = ['Repeating Product IDs', True, 0]
 		listDict = list(theDict1)
@@ -279,7 +280,7 @@ def main(filepath, delimiter):
 					if item == row['product_id']:
 						flag = 1
 						break
-					
+
 				if flag != 1 :
 					invalidlist.append(item)
 					print "INVALID PARENT PRODUCT ---->", item
@@ -288,7 +289,7 @@ def main(filepath, delimiter):
 			validated_feed['product']['invalid_parent_product'] = ['Invalid Parent Product IDs', True, "None"]
 		else:
 			validated_feed['product']['invalid_parent_product'] = ['Invalid Parent Product IDs', False, invalidlist]
-			
+
 
 
 
@@ -296,14 +297,14 @@ def main(filepath, delimiter):
 	def prodCatCheck(f,zipF,files):
 		print '-----------------------------------------------'
 		print 'Product in Category file Checker'
-		pcfD = zipF.open(f) 
+		pcfD = zipF.open(f)
 		print f + ' File validation in progress'
 		pcLine = pcfD.readlines()
 		pcDict = fileOpen(f,zipF)
 		pcCount = fieldCount(f,zipF)
 		pcHeader = pcLine[0].rstrip()
 		pcHeaderRes = headerCheck(pcHeader,f)
-		if pcHeaderRes is 1: 
+		if pcHeaderRes is 1:
 			print 'Product in Category File Headers Check Status ----> SUCCESS'
 			validated_feed['product in category']['product_in_category_file_headers'] = ['Product in Category File Headers Check', True, 'SUCCESS']
 		else:
@@ -317,7 +318,7 @@ def main(filepath, delimiter):
 			validated_feed['product in category']['product_in_cat_column_count_check'] = ['Product in Category File Column Count Check', True, 'SUCCESS']
 		pcProd = list()
 		pcCat = list()
-		for rows in pcDict:	
+		for rows in pcDict:
 			pcProd.append(rows['product_id'])
 			pcCat.append(rows['category_id'])
 		invalidProd = list()
@@ -336,7 +337,7 @@ def main(filepath, delimiter):
 			if cat not in set(catIds):
 				invalidCat.append(cat)
 
-		# print 'MASTER CAT SET---->',setCat 
+		# print 'MASTER CAT SET---->',setCat
 		# print 'pc CAT SET',pcCatSet
 		invalidProd = list(pcProdSet - setProd)
 		invalidCat = list(pcCatSet - setCat)
@@ -360,14 +361,14 @@ def main(filepath, delimiter):
 	def prodAttCheck(f,zipF,files):
 		print '-----------------------------------------------'
 		print 'Product Attribute File Checker'
-		pAttfD = zipF.open(f) 
+		pAttfD = zipF.open(f)
 		print f + ' File validation in progress'
 		pAttLine = pAttfD.readlines()
 		pAttDict = fileOpen(f,zipF)
 		pAttCount = fieldCount(f,zipF)
 		pAttHeader = pAttLine[0].rstrip()
 		pAttHeaderRes = headerCheck(pAttHeader,f)
-		if pAttHeaderRes is 1: 
+		if pAttHeaderRes is 1:
 			print 'Product in Category File Headers Check Status ----> SUCCESS'
 			validated_feed['product']['product_in_attribute_file_headers'] = ['Product Attribute File Headers Check', True, 'SUCCESS']
 		else:
@@ -409,14 +410,14 @@ def main(filepath, delimiter):
 	def localProdCheck(f,zipF,files):
 		print '-----------------------------------------------'
 		print 'localized_product check'
-		loProdfD = zipF.open(f) 
+		loProdfD = zipF.open(f)
 		print f + ' File validation in progress'
 		loProdLine = loProdfD.readlines()
 		loProdDict = fileOpen(f,zipF)
 		loProdCount = fieldCount(f,zipF)
 		loProdHeader = loProdLine[0].rstrip()
 		loProdHeaderRes = headerCheck(loProdHeader,f)
-		if loProdHeaderRes is 1: 
+		if loProdHeaderRes is 1:
 			print 'Localized Product File Headers Check Status ----> SUCCESS'
 			validated_feed['product']['local_product_file_headers'] = ['Localized Product File Headers Check', True, "SUCCESS"]
 		else:
@@ -455,27 +456,27 @@ def main(filepath, delimiter):
 	def fileOpen(f,zipF):
 		print '-----------------------------------------------'
 		print 'Zip Content File Open and Reset'
-		fd = zipF.open(f) 
+		fd = zipF.open(f)
 		theDict = csv.DictReader(fd,delimiter=delim)
 		return theDict
 		validated_feed['overall']['dictionary'] = ['Dictionary', True, theDict]
 
 
-	#Header Check Function 
+	#Header Check Function
 	def headerCheck(header,f):
 		print '-----------------------------------------------'
 		print 'Header Check Function'
 		if re.search('^category_full.*.txt',f):
-			checkArray = ['category_id','parent_id','name']	
+			checkArray = ['category_id','parent_id','name']
 			validated_feed['overall']['unidentified_file_type'] = ['Unidentified File Type', True, "None"]
 		elif re.search('^product_full.*.txt',f):
-			checkArray = ['product_id','name','price','recommendable','link_url','image_url']  
+			checkArray = ['product_id','name','price','recommendable','link_url','image_url']
 	        elif re.search('^product_in_category.*.txt',f):
-		        checkArray = ['category_id','product_id']  
+		        checkArray = ['category_id','product_id']
 	        elif re.search('^product_attribute.*.txt',f):
-	                checkArray = ['product_id','attr_name','attr_value']   
+	                checkArray = ['product_id','attr_name','attr_value']
 	        elif re.search('^localized_product.*.txt',f):
-	                checkArray = ['product_id','name','description','language_tag','image_url','link_url']   
+	                checkArray = ['product_id','name','description','language_tag','image_url','link_url']
 	        else:
 			print 'Unidentified file type ---------> ', f
 			validated_feed['overall']['unidentified_file_type'] = ['Unidentified File Type', False, f]
@@ -484,12 +485,12 @@ def main(filepath, delimiter):
 		for i in checkArray:
 			flagArray = []
 			if re.search(i,header):
-				flag1 = flag1 and flag1  
+				flag1 = flag1 and flag1
 	        	else:
 				flag1 = 0
 			if flag1 is 0:
 				print 'Following field in header needs review ---->',i
-				flagArray.append(i) 
+				flagArray.append(i)
 		if len(flagArray) > 0:
 			validated_feed['overall']['header_field_needs_review'] = ['Header Fields That Need Review', False, flagArray]
 		else:
@@ -503,18 +504,18 @@ def main(filepath, delimiter):
 		if c is 4:
 			fileFormat = ['product_full','category_full','product_in_category','product_attribute']
 		elif c is 3:
-			fileFormat = ['product_full','category_full','product_in_category'] 
-		else: 
+			fileFormat = ['product_full','category_full','product_in_category']
+		else:
 			fileFormat = fileStr
 			# print "The catalog file is invalid! Kindly check contents...", fileStr
-		countPass = 0 
+		countPass = 0
 		for f in fileFormat:
 			flag = 0
 			patt = f+'.*.txt'
 			resPat = re.search(patt,fileStr)
-			print 'Checking for file presence and format...',patt 
+			print 'Checking for file presence and format...',patt
 			if resPat != None:
-				flag =  1 
+				flag =  1
 				countPass = countPass + 1
 			if flag is 1:
 				print 'File Name Check ----> SUCCESS'
@@ -524,7 +525,7 @@ def main(filepath, delimiter):
 				validated_feed['overall']['flat_file_name_check'] = ['Flat File Name Check', False, "FAILED"]
 
 		if countPass != c:
-			print 'File names within catalog feed aren\'t per required format' 
+			print 'File names within catalog feed aren\'t per required format'
 			return 'pass'
 		else:
 			return 'pass'
@@ -538,4 +539,9 @@ def main(filepath, delimiter):
 	# sorted_feed = OrderedDict(sorted(validated_feed.items(), key=lambda t: t[0]))
 	return validated_feed
 
-
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser(description='Check the validity of a flat file catalog feed')
+	parser.add_argument('-f', '--feed', required=True, help='Filename of the feed to validate')
+	parser.add_argument('-d', '--delimiter', default='|', help='Field delimiter')
+	args = parser.parse_args()
+	main(args.feed, args.delimiter)

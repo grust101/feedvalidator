@@ -1,4 +1,4 @@
-<!DOCTYPE html>	
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -38,7 +38,7 @@
 
   	});
   });
-  
+
 });
 
 </script>
@@ -48,19 +48,19 @@
 		<h1 class="navbar-brand vertical-center text-center" style="color:white; font-size:30px;">RR Feed Validator</h1>
 	</nav>
 
-	<div class="container-fluid">    
+	<div class="container-fluid">
 		<div class="row content" style="margin-bottom: 25px">
 		<div class="col-sm-4 sidenav">
 			</div>
 
-			<div class="col-sm-4 text-center"> 
-				<form class="form-horizontal" method="GET" action="/check" enctype="multipart/form-data">
+			<div class="col-sm-4 text-center">
+					<form method=POST enctype=multipart/form-data action="{{ url_for('upload') }}">
 					<div class="form-group">
 						<h2><strong>Choose a Feed File to Validate:</strong></h2>
 						<div class="input-group">
 							<label class="input-group-btn">
 								<span class="btn btn-default btn-md">
-									Browse&hellip; <input type="file" name="file" style="display: none;" multiple>
+									Browse&hellip; <input type="file" name="feedfile" style="display: none;" multiple>
 								</span>
 							</label>
 							<input type="text" class="form-control" readonly>
@@ -84,4 +84,3 @@
 </body>
 
 </html>
-

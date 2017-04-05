@@ -1,1 +1,4 @@
-catalog_full_republicoftea_01_24_2017.zip
+feedchecker/
+uploads/
+catalog_full_*.zip
+*.pyc
